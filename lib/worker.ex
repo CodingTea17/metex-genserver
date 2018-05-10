@@ -10,7 +10,11 @@ defmodule MetexGenserver.Worker do
     GenServer.call(pid, {:location, location})
   end
 
-  #Server
+  def get_stats(pid) do
+    GenServer.call(pid, :get_stats)
+  end
+
+  # Server
   def init(:ok) do
     {:ok, %{}}
   end
@@ -26,4 +30,46 @@ defmodule MetexGenserver.Worker do
     end
   end
 
+  def handle_call(:get_stats, _from, stats) do
+    {:reply, stats, stats}
+  end
+
+  # Helpers
+  defp temperature_of(location) do
+    url_for(location) |> HTTPoison.get |> parse_response
+  end
+
+  defp url_for(location) do
+    "http://api.openweathermap.org/data/2.5/weather?q=#{location}&APPID=#{apikey()}"
+  end
+
+  defp parse_response({:ok, %HTTPoison.Response{body: body, status_code: 200}}) do
+    body |> JSON.decode! |> compute_temperature
+  end
+
+  defp parse_response(_) do
+    :error
+  end
+
+  defp compute_temperature(json) do
+    try do
+      temp = (json["main"]["temp"] - 273.15) |> Float.round(1)
+      {:ok, temp}
+    rescue
+      _ -> :error
+    end
+  end
+
+  defp apikey do
+    System.get_env("WEATHER_API_KEY")
+  end
+
+  defp update_stats(old_stats, location) do
+    case Map.has_key?(old_stats, location) do
+      true ->
+        Map.update!(old_stats, location, &(&1 + 1))
+      false ->
+        Map.put_new(old_stats, location, 1)
+    end
+  end
 end

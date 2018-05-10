@@ -19,3 +19,5 @@ Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_do
 and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
 be found at [https://hexdocs.pm/metex_genserver](https://hexdocs.pm/metex_genserver).
 
+## API Key
+Go to https://openweathermap.org/appid to get an api key. Store it in a system environment variable called "WEATHER_API_KEY" and you'll be good to go!
