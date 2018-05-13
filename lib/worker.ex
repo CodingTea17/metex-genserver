@@ -11,6 +11,14 @@ defmodule MetexGenserver.Worker do
     GenServer.call(pid, {:location, location})
   end
 
+  def get_stats(pid) do
+    GenServer.call(pid, :get_stats)
+  end
+
+  def reset_stats(pid) do
+    GenServer.cast(pid, :reset_stats)
+  end
+
   # Server
 
   def init(:ok) do
@@ -28,6 +36,14 @@ defmodule MetexGenserver.Worker do
     end
   end
 
+  def handle_call(:get_stats, _from, stats) do
+    {:reply, stats, stats}
+  end
+
+  def handle_cast(:reset_stats, _stats) do
+    {:noreply, %{}}
+  end
+
   # Helper
 
   defp temp_of(location) do
@@ -35,7 +51,7 @@ defmodule MetexGenserver.Worker do
   end
 
   defp url_for(location) do
-    "http://api.openweathermap.org/data/2.5/weather?q=#{location}&APPID=#{apikey}"
+    "http://api.openweathermap.org/data/2.5/weather?q=#{location}&APPID=#{apikey()}"
   end
 
   defp parse_res({:ok, %HTTPoison.Response{body: body, status_code: 200}}) do
