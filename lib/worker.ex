@@ -55,9 +55,9 @@ defmodule MetexGenserver.Worker do
   end
 
   def terminate(reason, stats) do
-      IO.puts("Server is being terminated due to #{inspect reason}")
-        inspect(stats)
-      :ok
+    IO.puts("Server is being terminated due to #{inspect reason}")
+      inspect(stats)
+    :ok
   end
 
   def handle_info(msg, stats) do
